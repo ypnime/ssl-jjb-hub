@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>快速了解 jjb — 网站身份验证与安全通信服务</title>
+  <style>
+    /* reset & base */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f4f9fc; /* 极淡蓝绿基底 */
+      color: #1a2e35;
+      line-height: 1.6;
+      padding: 1.25rem 1rem 2.5rem;
+    }
+
+    /* 网格容器 — 信息卡片式布局 */
+    .page-grid {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    /* 通用卡片 */
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 6px 18px rgba(0, 100, 100, 0.06);
+      padding: 2rem 1.5rem;
+      transition: box-shadow 0.2s ease;
+      border: 1px solid #d9eae9;
+    }
+
+    .card:hover {
+      box-shadow: 0 10px 24px rgba(0, 120, 120, 0.10);
+    }
+
+    /* 主视觉 — hero */
+    .hero {
+      background: linear-gradient(145deg, #e0f0ef 0%, #c8e3df 100%);
+      border: none;
+      text-align: center;
+      padding: 2.5rem 1.5rem 2rem;
+    }
+
+    .hero h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #0b3d42;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero .sub {
+      font-size: 1.1rem;
+      color: #1d555b;
+      margin-bottom: 1.6rem;
+      border-bottom: 2px solid #7bb8b3;
+      display: inline-block;
+      padding-bottom: 0.25rem;
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+      color: #1b4b4f;
+    }
+
+    /* 用途卡片区域 — 三列网格 */
+    .purpose-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-top: 0.2rem;
+    }
+
+    .purpose-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 1.5rem 1.25rem;
+      border: 1px solid #cfe3e0;
+      box-shadow: 0 4px 12px rgba(30, 80, 80, 0.04);
+    }
+
+    .purpose-card h3 {
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: #0f4b4f;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .purpose-card h3::before {
+      content: "🔐";
+      font-size: 1.5rem;
+    }
+
+    .purpose-card:nth-child(2) h3::before { content: "🔄"; }
+    .purpose-card:nth-child(3) h3::before { content: "⚙️"; }
+
+    .purpose-card p {
+      font-size: 0.98rem;
+      color: #264e52;
+    }
+
+    /* 适合人群 — 横向标签样式 */
+    .audience-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem 1rem;
+      margin: 0.5rem 0 0.2rem;
+    }
+
+    .audience-tag {
+      background: #d0ece7;
+      color: #0b474b;
+      padding: 0.3rem 1rem 0.3rem 1.8rem;
+      border-radius: 40px;
+      font-size: 0.95rem;
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .audience-tag::before {
+      content: "▹";
+      position: absolute;
+      left: 12px;
+      color: #1f7a77;
+      font-weight: 600;
+    }
+
+    /* 自然链接段落 + 小提示 */
+    .link-sentence {
+      background: #dff1ef;
+      border-radius: 20px;
+      padding: 1.6rem 1.5rem;
+      border-left: 5px solid #3c8b85;
+    }
+
+    .link-sentence p {
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .link-sentence a {
+      color: #0b5e5a;
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 2px solid #6fb5ae;
+      padding-bottom: 1px;
+    }
+
+    .link-sentence a:hover {
+      background: #badcd6;
+      border-bottom-color: #0b5e5a;
+    }
+
+    .faq-mini {
+      background: #e8f3f0;
+      border-radius: 18px;
+      padding: 1.2rem 1.4rem;
+      margin-top: 0.4rem;
+    }
+
+    .faq-mini summary {
+      font-weight: 500;
+      color: #0d4b4b;
+      cursor: pointer;
+      padding: 0.3rem 0;
+    }
+
+    .faq-mini p {
+      margin-top: 0.6rem;
+      color: #23555a;
+      font-size: 0.98rem;
+    }
+
+    /* 装饰分割 */
+    .decor-line {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7fbeb6, transparent);
+      margin: 1rem 0 0.6rem;
+      opacity: 0.5;
+    }
+
+    /* 响应式 */
+    @media (min-width: 640px) {
+      .purpose-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .hero h1 { font-size: 2.8rem; }
+      .page-grid { gap: 2rem; }
+      .card { padding: 2.4rem 2rem; }
+    }
+
+    @media (min-width: 900px) {
+      body { padding: 2rem 2rem 3rem; }
+      .hero { padding: 3.5rem 2rem 2.8rem; }
+    }
+
+    /* 辅助间距 */
+    .mt-1 { margin-top: 0.75rem; }
+    .mb-1 { margin-bottom: 0.75rem; }
+    .text-small { font-size: 0.92rem; color: #3b6869; }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+
+    <!-- 主视觉 hero -->
+    <div class="card hero">
+      <h1>jjb · 让网站身份一目了然</h1>
+      <div class="sub">SSL / TLS 证书 · 域名验证 · 加密通信</div>
+      <p>
+        当你打开一个网站，最关心的往往是：<strong>它可信吗？</strong><br>
+        jjb 帮助你快速识别网站是否经过身份验证，连接是否安全加密。
+        不夸大、不复杂，只呈现你需要的数字证书信息。
+      </p>
+    </div>
+
+    <!-- 用途卡片：三块 -->
+    <div class="purpose-grid">
+      <div class="purpose-card">
+        <h3>验证域名所有权</h3>
+        <p>通过 DV、OV、EV 证书确认该域名背后的组织或个人是否经过 CA 审核。地址栏的小锁标志背后，是 jjb 帮你核验的第一道关。</p>
+      </div>
+      <div class="purpose-card">
+        <h3>检测加密状态</h3>
+        <p>查看网站是否启用 TLS 1.2 / 1.3，证书链是否完整，是否被浏览器信任。不安全的连接会在 jjb 的检测中清楚标注。</p>
+      </div>
+      <div class="purpose-card">
+        <h3>证书生命周期提醒</h3>
+        <p>证书何时签发、何时到期、是否被吊销。jjb 提供清晰的证书时间线，避免因证书过期导致服务中断或用户警告。</p>
+      </div>
+    </div>
+
+    <!-- 适合人群 + 自然链接段落混合卡片 -->
+    <div class="card">
+      <h2 style="font-weight: 500; font-size: 1.4rem; color: #0f4b4f; margin-bottom: 0.2rem;">这些人群常使用 jjb</h2>
+      <div class="audience-wrap">
+        <span class="audience-tag">网站运维</span>
+        <span class="audience-tag">安全审计</span>
+        <span class="audience-tag">技术决策者</span>
+        <span class="audience-tag">普通访客</span>
+        <span class="audience-tag">开发者</span>
+      </div>
+      <p class="mt-1 text-small" style="margin-bottom: 0.2rem;">
+        无论你是要检查自己的站点，还是想了解某个网站的证书背景，jjb 都能提供简洁、可读的摘要。
+      </p>
+
+      <!-- 自然嵌入链接的句子 -->
+      <div class="link-sentence mt-1">
+        <p>
+          想知道一个网站的真实证书信息？试试把域名粘贴到 <a href="https://ssl-jjb.com">jjb</a> 的搜索框，几秒钟就能看到证书链、签发机构与有效期。
+        </p>
+        <p class="text-small" style="margin-bottom: 0;">
+          没有广告弹窗，没有诱导分享——只为帮你快速获取证书摘要。
+        </p>
+      </div>
+    </div>
+
+    <!-- 小FAQ + 额外说明卡片 -->
+    <div class="card">
+      <h3 style="font-weight: 500; color: #0f4b4f; margin-bottom: 0.5rem;">一些你可能想了解的问题</h3>
+      <details class="faq-mini" open>
+        <summary>jjb 和浏览器自带查看证书有什么不同？</summary>
+        <p>
+          浏览器通常隐藏了证书的深层细节，而 jjb 会展示完整的证书链、签名算法、SAN（主体备用名称）以及吊销状态。不需要在弹窗里翻找多级菜单。
+        </p>
+      </details>
+      <details class="faq-mini">
+        <summary>检测结果是否实时？</summary>
+        <p>
+          每次查询都会向目标服务器发起最新的 TLS 握手，而非读取缓存。证书状态基于当前连接时刻。
+        </p>
+      </details>
+      <details class="faq-mini">
+        <summary>我需要注册账户才能使用吗？</summary>
+        <p>
+          不需要。直接输入域名即可查询，jjb 目前无需登录。所有检测功能对访客开放。
+        </p>
+      </details>
+      <div class="decor-line"></div>
+      <p class="text-small" style="margin: 0.3rem 0 0;">
+        💡 日常浏览中如果遇到证书警告，不妨先用 jjb 查一下具体原因。
+      </p>
+    </div>
+
+    <!-- 页脚 / 二次自然提及 -->
+    <div style="text-align: center; margin-top: 0.6rem; color: #457a77; font-size: 0.9rem; border-top: 1px solid #c4dbd6; padding-top: 1.2rem;">
+      <span>关于网站身份验证，<a href="https://ssl-jjb.com" style="color: #1a6b63; text-decoration: underline 1px dashed #3a9890;">jjb</a> 只呈现事实，不夸大价值。</span>
+      <span class="text-small" style="display: block; margin-top: 0.4rem; opacity: 0.7;">基于公开证书信息，帮助用户做出自己的判断</span>
+    </div>
+
+  </div>
+</body>
+</html>
